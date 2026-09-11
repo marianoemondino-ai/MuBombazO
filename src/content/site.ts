@@ -36,6 +36,10 @@ export const rankingTabs = [
   { key: "guilds", label: "Top Guilds" },
   { key: "players", label: "Top Players" },
   { key: "killers", label: "Top Killers" },
+  { key: "bloodcastle", label: "Blood Castle" },
+  { key: "chaoscastle", label: "Chaos Castle" },
+  { key: "devilsquare", label: "Devil Square" },
+  { key: "illusiontemple", label: "Illusion Temple" },
 ] as const;
 
 // Roadmap de progresion. Completa fechas reales antes de publicar - si

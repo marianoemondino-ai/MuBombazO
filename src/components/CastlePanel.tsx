@@ -11,11 +11,27 @@ export default async function CastlePanel() {
       <dl className="mt-4 space-y-3 text-sm">
         <div className="flex items-center justify-between">
           <dt className="text-muted">Dueno del Castillo</dt>
-          <dd className="font-medium">{castle?.ownerGuild ?? "-"}</dd>
+          <dd className="font-medium">
+            {castle?.ownerGuild ? (
+              <Link href={`/guild/${encodeURIComponent(castle.ownerGuild)}`} className="hover:text-accent hover:underline">
+                {castle.ownerGuild}
+              </Link>
+            ) : (
+              "-"
+            )}
+          </dd>
         </div>
         <div className="flex items-center justify-between">
           <dt className="text-muted">Guild Master</dt>
-          <dd className="font-medium">{castle?.guildMaster ?? "-"}</dd>
+          <dd className="font-medium">
+            {castle?.guildMaster ? (
+              <Link href={`/perfil/${encodeURIComponent(castle.guildMaster)}`} className="hover:text-accent hover:underline">
+                {castle.guildMaster}
+              </Link>
+            ) : (
+              "-"
+            )}
+          </dd>
         </div>
       </dl>
 

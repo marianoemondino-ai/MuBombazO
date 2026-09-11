@@ -2,10 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { getClassIcon, getClassName } from "@/lib/mu-classes";
 import {
+  getEventRanking,
   getTopDuelos,
   getTopGuilds,
   getTopKillers,
   getTopPlayers,
+  type EventRankingKey,
 } from "@/lib/rankings";
 import { rankingTabs } from "@/content/site";
 
@@ -17,6 +19,8 @@ type TabKey = (typeof rankingTabs)[number]["key"];
 function isTabKey(value: string): value is TabKey {
   return rankingTabs.some((t) => t.key === value);
 }
+
+const EVENT_TABS: TabKey[] = ["bloodcastle", "chaoscastle", "devilsquare", "illusiontemple"];
 
 export default async function RankingPage({
   searchParams,
@@ -51,6 +55,7 @@ export default async function RankingPage({
         {tab === "guilds" && <GuildsTable />}
         {tab === "duelos" && <DuelosTable />}
         {tab === "killers" && <KillersTable />}
+        {EVENT_TABS.includes(tab) && <EventTable eventKey={tab as EventRankingKey} />}
       </div>
     </div>
   );
@@ -76,6 +81,22 @@ function Td({ children, right }: { children: React.ReactNode; right?: boolean })
   return <td className={`px-4 py-3 ${right ? "text-right" : "text-left"}`}>{children}</td>;
 }
 
+function PlayerLink({ name }: { name: string }) {
+  return (
+    <Link href={`/perfil/${encodeURIComponent(name)}`} className="hover:text-accent hover:underline">
+      {name}
+    </Link>
+  );
+}
+
+function GuildLink({ name }: { name: string }) {
+  return (
+    <Link href={`/guild/${encodeURIComponent(name)}`} className="hover:text-accent hover:underline">
+      {name}
+    </Link>
+  );
+}
+
 async function PlayersTable() {
   const rows = await getTopPlayers();
   if (rows.length === 0) return <Empty />;
@@ -94,7 +115,7 @@ async function PlayersTable() {
           {rows.map((r, i) => (
             <tr key={r.Name}>
               <Td>{i + 1}</Td>
-              <Td>{r.Name}</Td>
+              <Td><PlayerLink name={r.Name} /></Td>
               <Td right>{r.Score.toLocaleString("es-AR")}</Td>
               <Td right>{r.Score_semanal.toLocaleString("es-AR")}</Td>
             </tr>
@@ -123,7 +144,7 @@ async function GuildsTable() {
           {rows.map((r, i) => (
             <tr key={r.Name}>
               <Td>{i + 1}</Td>
-              <Td>{r.Name}</Td>
+              <Td><GuildLink name={r.Name} /></Td>
               <Td right>{r.Score.toLocaleString("es-AR")}</Td>
               <Td right>{r.Score_semanal.toLocaleString("es-AR")}</Td>
             </tr>
@@ -152,7 +173,7 @@ async function DuelosTable() {
           {rows.map((r, i) => (
             <tr key={r.Name}>
               <Td>{i + 1}</Td>
-              <Td>{r.Name}</Td>
+              <Td><PlayerLink name={r.Name} /></Td>
               <Td right>{r.WinScore}</Td>
               <Td right>{r.LoseScore}</Td>
             </tr>
@@ -182,7 +203,7 @@ async function KillersTable() {
           {rows.map((r, i) => (
             <tr key={r.Name}>
               <Td>{i + 1}</Td>
-              <Td>{r.Name}</Td>
+              <Td><PlayerLink name={r.Name} /></Td>
               <Td>
                 <span className="inline-flex items-center gap-2">
                   {getClassIcon(r.Class) && (
@@ -199,6 +220,35 @@ async function KillersTable() {
               </Td>
               <Td right>{r.Kills.toLocaleString("es-AR")}</Td>
               <Td right>{r.Deads.toLocaleString("es-AR")}</Td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+async function EventTable({ eventKey }: { eventKey: EventRankingKey }) {
+  const rows = await getEventRanking(eventKey);
+  if (rows.length === 0) return <Empty />;
+  return (
+    <div className="glow-border overflow-x-auto rounded-lg">
+      <table className="w-full text-sm">
+        <thead className="border-b border-border">
+          <tr>
+            <Th>#</Th>
+            <Th>Jugador</Th>
+            <Th right>Puntos</Th>
+            <Th right>Semanal</Th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {rows.map((r, i) => (
+            <tr key={r.Name}>
+              <Td>{i + 1}</Td>
+              <Td><PlayerLink name={r.Name} /></Td>
+              <Td right>{r.Score.toLocaleString("es-AR")}</Td>
+              <Td right>{r.Score_semanal.toLocaleString("es-AR")}</Td>
             </tr>
           ))}
         </tbody>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { getClassIcon, getClassName } from "@/lib/mu-classes";
 import Image from "next/image";
+import Link from "next/link";
 import type {
   DuelRankRow,
   GuildRankRow,
@@ -55,7 +56,7 @@ export default function HomeRankingTabs({
             rows={duelos}
             empty="Todavia no hay duelos registrados."
             render={(r, i) => (
-              <Row key={r.Name} rank={i + 1} name={r.Name} value={`${r.WinScore}W / ${r.LoseScore}L`} />
+              <Row key={r.Name} rank={i + 1} name={r.Name} href={`/perfil/${encodeURIComponent(r.Name)}`} value={`${r.WinScore}W / ${r.LoseScore}L`} />
             )}
           />
         )}
@@ -64,7 +65,7 @@ export default function HomeRankingTabs({
             rows={guilds}
             empty="Todavia no hay guilds rankeadas."
             render={(r, i) => (
-              <Row key={r.Name} rank={i + 1} name={r.Name} value={r.Score.toLocaleString("es-AR")} />
+              <Row key={r.Name} rank={i + 1} name={r.Name} href={`/guild/${encodeURIComponent(r.Name)}`} value={r.Score.toLocaleString("es-AR")} />
             )}
           />
         )}
@@ -73,7 +74,7 @@ export default function HomeRankingTabs({
             rows={players}
             empty="Todavia no hay jugadores rankeados."
             render={(r, i) => (
-              <Row key={r.Name} rank={i + 1} name={r.Name} value={r.Score.toLocaleString("es-AR")} />
+              <Row key={r.Name} rank={i + 1} name={r.Name} href={`/perfil/${encodeURIComponent(r.Name)}`} value={r.Score.toLocaleString("es-AR")} />
             )}
           />
         )}
@@ -91,7 +92,9 @@ export default function HomeRankingTabs({
                 {getClassIcon(k.Class) && (
                   <Image src={getClassIcon(k.Class)!} alt="" width={24} height={24} className="rounded" />
                 )}
-                <span className="flex-1 text-sm font-medium">{k.Name}</span>
+                <Link href={`/perfil/${encodeURIComponent(k.Name)}`} className="flex-1 text-sm font-medium hover:text-accent hover:underline">
+                  {k.Name}
+                </Link>
                 <span className="text-xs text-muted">{getClassName(k.Class)}</span>
                 <span className="text-sm font-semibold text-accent">{k.Kills.toLocaleString("es-AR")}</span>
               </div>
@@ -118,14 +121,17 @@ function RankList<T>({
   return <div className="space-y-1.5">{rows.map(render)}</div>;
 }
 
-function Row({ rank, name, value }: { rank: number; name: string; value: string }) {
+function Row({ rank, name, href, value }: { rank: number; name: string; href: string; value: string }) {
   return (
-    <div className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-surface-2">
+    <Link
+      href={href}
+      className="flex items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-surface-2"
+    >
       <span className="flex items-center gap-3">
         <span className="w-5 text-xs text-muted">#{rank}</span>
-        <span className="font-medium">{name}</span>
+        <span className="font-medium hover:text-accent hover:underline">{name}</span>
       </span>
       <span className="text-muted">{value}</span>
-    </div>
+    </Link>
   );
 }

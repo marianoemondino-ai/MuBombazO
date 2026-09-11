@@ -95,3 +95,35 @@ export function getTopKillers(limit = 10) {
     return result.recordset;
   });
 }
+
+// Tablas de ranking por evento que comparten la forma Name/Score(/Score_semanal).
+// Los nombres de tabla vienen del propio emulador (Louis), no son configurables.
+const EVENT_RANKING_TABLES = {
+  bloodcastle: "RankingBloodCastle",
+  chaoscastle: "RankingChaosCastle",
+  devilsquare: "RankingDevilSquare",
+  illusiontemple: "RankingIllusionTemple",
+} as const;
+
+export type EventRankingKey = keyof typeof EVENT_RANKING_TABLES;
+
+const EVENT_RANKING_HAS_WEEKLY: Record<EventRankingKey, boolean> = {
+  bloodcastle: true,
+  chaoscastle: true,
+  devilsquare: true,
+  illusiontemple: false,
+};
+
+export function getEventRanking(key: EventRankingKey, limit = 10) {
+  return safeQuery<PlayerRankRow>(async () => {
+    const pool = await getPool();
+    const table = EVENT_RANKING_TABLES[key];
+    const weeklyCol = EVENT_RANKING_HAS_WEEKLY[key] ? "Score_semanal" : "0 AS Score_semanal";
+    const result = await pool.request().input("limit", limit).query<PlayerRankRow>(
+      `SELECT TOP (@limit) Name, Score, ${weeklyCol}
+       FROM ${table}
+       ORDER BY Score DESC`
+    );
+    return result.recordset;
+  });
+}
